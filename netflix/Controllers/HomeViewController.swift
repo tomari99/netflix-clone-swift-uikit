@@ -14,6 +14,8 @@ class HomeViewController: UIViewController {
         table.register(CollectionViewTableViewCell.self, forCellReuseIdentifier: CollectionViewTableViewCell.identifier)
         return table
     }()
+    
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,14 +25,33 @@ class HomeViewController: UIViewController {
         homeFeedTable.delegate = self
         homeFeedTable.dataSource = self
         
-        let headerView = HeroHeaderUiView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: 450))
+        configureNavbar()
+        
+        let headerView = HeroHeaderUiView(frame: CGRect(x: 0, y: 0, width: view.bounds.width, height: 450))
         homeFeedTable.tableHeaderView = headerView
     }
+    
+    private func configureNavbar() {
+         var image = UIImage(named: "netflixlogo")
+        image = image?.withRenderingMode(.alwaysOriginal)
+
+        navigationController?.navigationBar.tintColor = .white
+        
+        navigationItem.setLeftBarButton( UIBarButtonItem(image: image, style: .done, target: self, action: nil), animated:false)
+        
+         navigationItem.rightBarButtonItems = [
+             UIBarButtonItem(image: UIImage(systemName: "person"), style: .done, target: self, action: nil),
+             UIBarButtonItem(image: UIImage(systemName: "play.rectangle"), style: .done, target: self, action: nil)
+         ]
+     }
+    
     
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         homeFeedTable.frame = view.bounds
     }
+    
+    
 }
 
 extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
@@ -58,5 +79,12 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let defaultOffset = view.safeAreaInsets.top
+        let offset = scrollView.contentOffset.y + defaultOffset
+        
+        navigationController?.navigationBar.transform = .init(translationX: 0, y: min(0, -offset))
     }
 }
